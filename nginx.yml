@@ -1,0 +1,26 @@
+---
+
+# Automating Nginx Installation
+- hosts: loadbalancer
+  gather_facts: yes
+  become: yes
+  handlers:
+    - name: restart nginx
+      service: name=nginx state=restarted
+  tasks:
+  - name: Installing Nginx
+    apt:
+      name: nginx
+      state: latest
+      update_cache: yes
+  - name: Deleting Default
+    file:
+      path: /etc/nginx/sites-enabled/default
+      state: absent
+    notify: restart nginx
+  post_tasks:
+    - name: Starting Service
+      service:
+        name: nginx
+        state: started
+        enabled: yes

@@ -1,0 +1,21 @@
+---
+
+# Automating Jenkins Installation
+- hosts: other
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: Installing Key
+      apt_key:
+        url: https://pkg.jenkins.io/debian/jenkins-ci.org.key
+        state: present
+    - name: Adding Repository
+      apt_repository:
+        repo: 'deb http://pkg.jenkins.io/debian-stable binary'
+        state: present
+    - name: Installing Jenkins
+      apt: name=jenkins state=latest update_cache=yes
+    - name: Enabling Service
+      service: name=jenkins state=started enabled=yes
+    - name: Installing Git
+      apt: name=git state=present
