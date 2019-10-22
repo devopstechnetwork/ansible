@@ -1,4 +1,4 @@
 # ansible
-Ansible LAMP stack with Jenkins on both CentOS and Ubuntu.
-This is a 4-machine Vagrant project that uses Ansible to provision a Apache, PHP, MySQL and Jenkins.
+Ansible LAMP stack with Nginx and Jenkins on both CentOS and Ubuntu.
+This is a multi-machine Vagrant project that uses Ansible to provision a Apache, PHP, MySQL, Nginx and Jenkins.
 
