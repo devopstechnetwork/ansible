@@ -1,0 +1,25 @@
+---
+
+# Automating Jenkins Installation
+- hosts: ci
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: Updating System
+      apt: upgrade=dist update_cache=yes
+      when: ansible_os_family == "Debian"
+    - name: Installing Key
+      apt_key:
+        url: https://pkg.jenkins.io/debian/jenkins-ci.org.key
+        state: present
+    - name: Adding Repository
+      apt_repository:
+        repo: 'deb http://pkg.jenkins.io/debian-stable binary'
+        state: present
+    - name: Installing Jenkins
+      apt: name=jenkins state=latest 
+    - name: Enabling Service
+      service: name=jenkins state=started enabled=yes
+      when: ansible_os_family == "Debian"
+    - name: Installing Git
+      apt: name=git state=present

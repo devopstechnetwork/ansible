@@ -1,0 +1,48 @@
+---
+
+# Automating MySQL Installation
+- hosts: dbserver
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: Updating System
+      apt: upgrade=dist update_cache=yes
+      when: ansible_os_family == "Debian"
+    - name: Installing MySQL
+      apt: name={{ item }} state=latest
+      with_items:
+        - mysql-server
+        - mysql-common
+        - python-mysqldb
+    - name: Enabling Service
+      service: name=mysql state=started enabled=yes
+      when: ansible_os_family == "Debian"
+    - name: Set Password
+      mysql_user:
+        name: root
+        password: tinnitus
+    - name: Get Password
+      src: my.cnf
+      dest: /root/.my.cnf
+      owner: root
+      mode: 0600
+    - name: Create Database
+      mysql_db:
+        name: employeedb
+        state: present
+    - name: Create User
+      mysql_user:
+        name: osadmin
+        password: letmein
+        host: '%'
+        priv: employeedb.*:ALL
+        state: present
+    - name: Upload File
+      copy:
+        src: employee.sql
+        dest: /tmp/employeedb.sql
+    - name: Import File
+      mysql_db:
+        state: import
+        name: all
+        target: /tmp/employee.sql

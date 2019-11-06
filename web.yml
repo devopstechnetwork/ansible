@@ -1,0 +1,32 @@
+---
+
+# Automating Apache Installation
+- hosts: webserver
+  gather_facts: yes
+  become: yes
+  handlers:
+    - name: restart apache
+      service: name=apache2 state=restarted
+  tasks:
+    - name: Updating System
+      apt: upgrade=dist update_cache=yes
+      when: ansible_os_family == "Debian"
+    - name: Installing Apache
+      apt: name=apache2 state=latest
+    - name: Enabling Service
+      service: name=apache2 state=started enabled=yes
+      when: ansible_os_family == "Debian"
+    - name: Installing PHP
+      apt: name={{ item }} state=latest
+      with_items:
+        - libapache2-mod-php7.2
+        - php7.2
+        - php7.2-mysql
+    - name: Changing Ownership
+      file:
+        path: /var/www/html
+        owner: vagrant
+        group: vagrant
+        recurse: yes
+      notify:
+        - restart apache

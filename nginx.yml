@@ -1,0 +1,26 @@
+---
+
+# Automating Nginx Installation
+- hosts: balancer
+  gather_facts: yes
+  become: yes
+  handlers:
+    - name: restart nginx
+      service: name=nginx state=restarted
+  tasks:
+  - name: Updating System
+    apt: upgrade=dist update_cache=yes
+    when: ansible_os_family == "Debian"
+  - name: Installing Nginx
+    apt:
+      name: nginx
+      state: latest
+  - name: Deleting Default
+    file:
+      path: /etc/nginx/sites-enabled/default
+      state: absent
+    notify: restart nginx
+  post_tasks:
+  - name: Starting Service
+    service: name=nginx state=started
+    when: ansible_os_family == "Debian"
